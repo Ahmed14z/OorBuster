@@ -89,7 +89,7 @@ inline void FixAma() { SetVCPFeature(Monitor, VCP_AMA, CachedAma); }
 inline void FixScanMode()
 {
     // Set Scan Mode to Underscan (typically 3 for most monitors).
-    SetVCPFeature(Monitor, VCP_SCAN_MODE, 3);
+    SetVCPFeature(Monitor, VCP_SCAN_MODE, 1);
 }
 
 void SetRefreshRate(int refreshRate)
