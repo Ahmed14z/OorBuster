@@ -1,4 +1,4 @@
-name: Build OorBuster
+name: Build and Release OorBuster
 
 on:
   push:
@@ -25,3 +25,27 @@ jobs:
       with:
         name: OorBuster.exe
         path: OorBuster\Release\OorBuster.exe
+
+    - name: Create a Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: "v1.0.${{ github.run_number }}" # Auto-generated version
+        release_name: "OorBuster Release v1.0.${{ github.run_number }}"
+        body: |
+          ## Changelog
+          - Automated release of OorBuster.
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: OorBuster/Release/OorBuster.exe
+        asset_name: OorBuster.exe
+        asset_content_type: application/octet-stream
