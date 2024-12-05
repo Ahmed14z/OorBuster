@@ -9,6 +9,8 @@
 
 const BYTE VCP_OSD_LANGUAGE = 0xCC;
 const BYTE VCP_PICTURE_MODE = 0xDC;
+const BYTE VCP_SCAN_MODE = 0xDA;
+
 const BYTE VCP_AMA = 0xF0;
 
 enum
@@ -27,6 +29,7 @@ DWORD OorDelay = 2000;
 DWORD PicDelay = 500;
 DWORD AmaDelay = 250;
 DWORD WakeDelay = 3000;
+DWORD CachedScanMode = 0;  // Default to normal mode.
 
 NOTIFYICONDATA TrayIcon;
 HANDLE Monitor;
@@ -62,8 +65,9 @@ void CachePhysicalMonitor()
 void CacheVcpValues()
 {
 	GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_OSD_LANGUAGE, NULL, &CachedOsdLanguage, NULL);
-	GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_PICTURE_MODE, NULL, &CachedPictureMode, NULL);
-	GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_AMA, NULL, &CachedAma, NULL);
+    GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_PICTURE_MODE, NULL, &CachedPictureMode, NULL);
+    GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_AMA, NULL, &CachedAma, NULL);
+    GetVCPFeatureAndVCPFeatureReply(Monitor, VCP_SCAN_MODE, NULL, &CachedScanMode, NULL);
 }
 
 void ReadLaunchParams()
@@ -83,6 +87,11 @@ void ReadLaunchParams()
 inline void FixOor() {SetVCPFeature(Monitor, VCP_OSD_LANGUAGE, CachedOsdLanguage);}
 inline void FixPic() {SetVCPFeature(Monitor, VCP_PICTURE_MODE, CachedPictureMode);}
 inline void FixAma() {SetVCPFeature(Monitor, VCP_AMA, CachedAma);}
+inline void FixScanMode()
+{
+    // Set Scan Mode to Underscan (value depends on your monitor, typically 2 or 3 for underscan).
+    SetVCPFeature(Monitor, VCP_SCAN_MODE, 2); 
+}
 
 void NextMode()
 {
@@ -90,6 +99,8 @@ void NextMode()
 	CacheVcpValues();
 	CachedPictureMode++;
 	FixPic();
+	FixScanMode(); // Ensure scan mode is set appropriately.
+
 }
 
 void PrevMode()
@@ -98,19 +109,22 @@ void PrevMode()
 	CacheVcpValues();
 	CachedPictureMode--;
 	FixPic();
+	FixScanMode(); // Ensure scan mode is set appropriately.
+
 }
 
 void ApplyVcpValues(bool wake = false)
 {
 	if (GetRefreshRate() <= 144)
-		return;
+        return;
 
-	if (wake)
-		Sleep(WakeDelay);
+    if (wake)
+        Sleep(WakeDelay);
 
-	Sleep(OorDelay); FixOor();
-	Sleep(PicDelay); FixPic();
-	Sleep(AmaDelay); FixAma();
+    Sleep(OorDelay); FixOor();
+    Sleep(PicDelay); FixPic();
+    Sleep(AmaDelay); FixAma();
+    Sleep(250); FixScanMode(); // Add this line to set scan mode after other settings.
 }
 
 void ShowTrayMenu(HWND wnd)
