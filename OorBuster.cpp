@@ -77,10 +77,11 @@ void ReadLaunchParams()
 
 	if (args && argCount > 1)
 	{
-		OorDelay = (DWORD)wcstod(args[1], L'\0');
-		PicDelay = (DWORD)wcstod(args[2], L'\0');
-		AmaDelay = (DWORD)wcstod(args[3], L'\0');
-		WakeDelay = (DWORD)wcstod(args[4], L'\0');
+		OorDelay = (DWORD)wcstod(args[1], nullptr);
+		PicDelay = (DWORD)wcstod(args[2], nullptr);
+		AmaDelay = (DWORD)wcstod(args[3], nullptr);
+		WakeDelay = (DWORD)wcstod(args[4], nullptr);
+
 	}
 }
 
