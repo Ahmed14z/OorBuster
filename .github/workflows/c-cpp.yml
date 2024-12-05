@@ -46,6 +46,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: OorBuster/Release/OorBuster.exe
+        asset_path: x64\Release\OorBuster.exe
         asset_name: OorBuster.exe
         asset_content_type: application/octet-stream
