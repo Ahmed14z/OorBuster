@@ -88,9 +88,11 @@ inline void FixPic() { SetVCPFeature(Monitor, VCP_PICTURE_MODE, CachedPictureMod
 inline void FixAma() { SetVCPFeature(Monitor, VCP_AMA, CachedAma); }
 inline void FixScanMode()
 {
-    // Set Scan Mode to Underscan (typically 3 for most monitors).
-    SetVCPFeature(Monitor, VCP_SCAN_MODE, 3);
+    // Set Scan Mode to Underscan. If 0x03 doesn't work, try 0x02 or other values.
+    SetVCPFeature(Monitor, VCP_SCAN_MODE, 0x03);
+    OutputDebugString(L"[INFO] Scan Mode set to Underscan\n");
 }
+
 
 void SetRefreshRate(int refreshRate)
 {
@@ -234,8 +236,20 @@ LRESULT CALLBACK WindowProc(_In_ HWND wnd, _In_ UINT msg, _In_ WPARAM wParam, _I
             OutputDebugString(L"[DEBUG] HOTKEY: Set Refresh Rate to 144Hz\n");
             SetRefreshRate(144);
             break;
-        }
-        break;
+        case 1002: // Alt + F5: Set to Normal Scan
+            OutputDebugString(L"[DEBUG] Setting Scan Mode to Normal\n");
+            SetVCPFeature(Monitor, VCP_SCAN_MODE, 0x01); // Normal Scan
+            break;
+        case 1003: // Alt + F6: Set to Overscan
+            OutputDebugString(L"[DEBUG] Setting Scan Mode to Overscan\n");
+            SetVCPFeature(Monitor, VCP_SCAN_MODE, 0x02); // Overscan
+            break;
+        case 1004: // Alt + F7: Set to Underscan
+            OutputDebugString(L"[DEBUG] Setting Scan Mode to Underscan\n");
+            SetVCPFeature(Monitor, VCP_SCAN_MODE, 0x03); // Underscan
+            break;
+            }
+            break;
     }
     return DefWindowProc(wnd, msg, wParam, lParam);
 }
@@ -310,6 +324,9 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR, _In_
     RegisterPowerSettingNotification(wnd, &GUID_CONSOLE_DISPLAY_STATE, DEVICE_NOTIFY_WINDOW_HANDLE);
     RegisterHotKey(wnd, 1000, MOD_ALT, VK_HOME); // Alt + Home
     RegisterHotKey(wnd, 1001, MOD_ALT, VK_F8);   // Alt + F8
+    RegisterHotKey(wnd, 1002, MOD_ALT, VK_F5); // Alt + F5: Normal Scan
+    RegisterHotKey(wnd, 1003, MOD_ALT, VK_F6); // Alt + F6: Overscan
+    RegisterHotKey(wnd, 1004, MOD_ALT, VK_F7); // Alt + F7: Underscan
 
     MSG msg;
 
